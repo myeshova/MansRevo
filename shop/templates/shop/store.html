@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MansRevo — Contemporary Menswear Collections</title>
+    <style>
+        :root {
+            --bg-color: #fcfcfc;
+            --text-primary: #111111;
+            --text-secondary: #666666;
+            --border-color: #e5e5e5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Tall Editorial Header Navigation */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            background: white;
+            padding: 40px 0;
+        }
+
+        .header-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        /* Premium Search bar block */
+        .search-form {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            border: 1px solid #111;
+            padding: 4px;
+            border-radius: 2px;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            outline: none;
+            letter-spacing: 0.5px;
+        }
+
+        .search-button {
+            background: #111;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-button:hover {
+            background: #333;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            margin-top: 5px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Large Hero Banner Section */
+        .hero-banner {
+            width: 100%;
+            height: 600px;
+            background-color: #222;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            text-align: center;
+            color: white;
+            z-index: 2;
+        }
+
+        .hero-overlay h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            margin: 0 0 10px 0;
+        }
+
+        .hero-overlay p {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #ccc;
+            margin: 0;
+        }
+
+        /* Main Catalog Layout Components */
+        main {
+            max-width: 1300px;
+            margin: 60px auto;
+            padding: 0 40px;
+        }
+
+        .collection-title {
+            font-size: 1.4rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            color: var(--text-secondary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 40px 30px;
+        }
+
+        .product-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card {
+            background: white;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .image-wrapper {
+            width: 100%;
+            height: 380px;
+            overflow: hidden;
+            background-color: #f5f5f5;
+            position: relative;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .no-image {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card:hover .image-wrapper img {
+            transform: scale(1.04);
+        }
+
+        .product-meta {
+            padding: 5px 0;
+        }
+
+        .brand {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .name {
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 0 0 6px 0;
+            color: var(--text-primary);
+        }
+
+        .price {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .empty-message {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 80px 0;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo">MansRevo</a>
+
+            <form action="/" method="GET" class="search-form">
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ query|default:'' }}"
+                    placeholder="Search premium tailoring, lifestyle footwear, outerwear..."
+                    class="search-input"
+                >
+                <button type="submit" class="search-button">Search</button>
+            </form>
+
+            <nav class="nav-links">
+                <a href="/">All Collections</a>
+                <a href="/admin/">Dashboard</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- LARGE PICTURE UNDER HEADER HERO BANNER -->
+ {% if not query %}
+    <div class="hero-banner">
+        {% if config and config.banner_image %}
+            <!-- This loads your custom choice directly from the database table rows safely -->
+            <img src="{{ config.banner_image.url }}" alt="{{ config.title }}">
+            <div class="hero-overlay">
+                <h1>{{ config.title }}</h1>
+                <p>{{ config.subtitle }}</p>
+            </div>
+        {% else %}
+            <!-- Default placeholder backdrop wrapper if you haven't uploaded an image yet -->
+            <div class="no-image" style="background: #222; color: #666; height: 600px; display: flex; align-items: center; justify-content: center; letter-spacing: 2px; text-transform: uppercase;">
+                Go to Admin Dashboard > Storefront Configurations to upload your main image.
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <main>
+        {% if query %}
+            <h2 class="collection-title">Search Results for "{{ query }}"</h2>
+        {% else %}
+            <h2 class="collection-title">Ready-To-Wear Catalog</h2>
+        {% endif %}
+
+        <div class="grid">
+            {% for product in products %}
+            <a href="/product/{{ product.pk }}/" class="product-link">
+                <div class="card">
+                    <div class="image-wrapper">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="no-image">No Image Available</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-meta">
+                        <div class="brand">{{ product.brand|default:"In-House" }}</div>
+                        <h3 class="name">{{ product.name }}</h3>
+                        <div class="price">${{ product.price }}</div>
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <div class="empty-message">
+                <p>No items found matching your search profile.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+</body>
+</html>
