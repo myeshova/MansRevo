@@ -143,10 +143,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
+# Keep this as it is
 STATIC_URL = '/static/'
+
+# Add this line right below STATIC_URL (Make sure it is NOT indented inside an 'if' statement)
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Tell WhiteNoise to compress and cache static files aggressively
+# WhiteNoise storage optimization rules
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
