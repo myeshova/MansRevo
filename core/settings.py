@@ -206,3 +206,16 @@ if 'collectstatic' not in sys.argv and 'makemigrations' not in sys.argv:
             User.objects.create_superuser('myeshova', 'admin@example.com', 'MansRevoMaster2026!')
     except Exception:
         pass
+
+
+# Add this at the very bottom of core/settings.py
+import os
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = '/media/'
