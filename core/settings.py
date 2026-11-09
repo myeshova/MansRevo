@@ -189,14 +189,20 @@ if not DEBUG:
     CSRF_TRUSTED_ORIGINS = ['https://mansrevo.onrender.com']
 
 
-from django.contrib.auth import get_user_model
-User = get_user_model()
-user_profile = User.objects.filter(username='myeshova').first()
-if user_profile:
-    user_profile.is_superuser = True
-    user_profile.is_staff = True
-    user_profile.is_active = True
-    user_profile.set_password('MansRevoMaster2026!')
-    user_profile.save()
-else:
-    User.objects.create_superuser('myeshova', 'admin@example.com', 'MansRevoMaster2026!')
+# FORCE RE-HASH PASSWORDS SECURELY ONLY AT RUNTIME
+import sys
+if 'collectstatic' not in sys.argv and 'makemigrations' not in sys.argv:
+    try:
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user_profile = User.objects.filter(username='myeshova').first()
+        if user_profile:
+            user_profile.is_superuser = True
+            user_profile.is_staff = True
+            user_profile.is_active = True
+            user_profile.set_password('MansRevoMaster2026!')
+            user_profile.save()
+        else:
+            User.objects.create_superuser('myeshova', 'admin@example.com', 'MansRevoMaster2026!')
+    except Exception:
+        pass
