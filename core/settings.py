@@ -11,9 +11,14 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load local development settings before reading environment variables below.
+load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -23,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-jd@f*)^qb#j(swu@$lo$#s(y#u+x&i_g2zx37+*n)#q$_$ux9p"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.getenv("DJANGO_DEBUG", "False").strip().lower() in {"1", "true", "yes", "on"}
 
 # Around line 28 inside core/settings.py
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
@@ -77,16 +82,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-import os
 import dj_database_url
-from pathlib import Path
-from dotenv import load_dotenv
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Load environment variables from .env file locally
-load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Reads DATABASE_URL from Render variables (production) or your local .env file
 DATABASE_URL = os.getenv('DATABASE_URL')
@@ -171,9 +167,8 @@ MAILERS = {
     },
 }
 
-import os
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # Security settings for Production (Render HTTPS)
@@ -189,33 +184,16 @@ if not DEBUG:
     CSRF_TRUSTED_ORIGINS = ['https://mansrevo.onrender.com']
 
 
-# FORCE RE-HASH PASSWORDS SECURELY ONLY AT RUNTIME
-import sys
-if 'collectstatic' not in sys.argv and 'makemigrations' not in sys.argv:
-    try:
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        user_profile = User.objects.filter(username='myeshova').first()
-        if user_profile:
-            user_profile.is_superuser = True
-            user_profile.is_staff = True
-            user_profile.is_active = True
-            user_profile.set_password('MansRevoMaster2026!')
-            user_profile.save()
-        else:
-            User.objects.create_superuser('myeshova', 'admin@example.com', 'MansRevoMaster2026!')
-    except Exception:
-        pass
-
-
-# Add this at the very bottom of core/settings.py
-import os
-
+# Cloudinary is used when deployment credentials are configured.
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-MEDIA_URL = '/media/'
+# Use persistent Cloudinary storage in deployments with credentials. Local
+# development uses MEDIA_ROOT so uploads remain available on disk.
+if all(CLOUDINARY_STORAGE.values()):
+    STORAGES["default"] = {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    }
