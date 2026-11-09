@@ -187,3 +187,23 @@ if not DEBUG:
 
     # Trust Render's domain for CSRF verification submissions
     CSRF_TRUSTED_ORIGINS = ['https://mansrevo.onrender.com']
+
+
+# TEMPORARY HARD FORCED LOGIN OVERRIDE
+from django.contrib.auth import get_user_model
+try:
+    User = get_user_model()
+    # Check if your primary profile already exists
+    user_profile = User.objects.filter(username='myeshova').first()
+    if user_profile:
+        # Re-enforce explicit staff parameters and set a fresh clear password
+        user_profile.is_superuser = True
+        user_profile.is_staff = True
+        user_profile.is_active = True
+        user_profile.set_password('MansRevoMaster2026!')
+        user_profile.save()
+    else:
+        # If it somehow got misplaced during state resets, rebuild it clean
+        User.objects.create_superuser('myeshova', 'admin@example.com', 'MansRevoMaster2026!')
+except Exception:
+    pass
