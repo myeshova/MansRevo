@@ -157,3 +157,16 @@ MAILERS = {
 import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# Security settings for Production (Render HTTPS)
+if not DEBUG:
+    # Ensure Django knows it's behind a secure proxy loader
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    # Enforce HTTPS cookies so sessions aren't dropped silently
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # Trust Render's domain for CSRF verification submissions
+    CSRF_TRUSTED_ORIGINS = ['https://mansrevo.onrender.com']
