@@ -197,3 +197,23 @@ if all(CLOUDINARY_STORAGE.values()):
     STORAGES["default"] = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     }
+
+# Send unhandled request exceptions to Render's service logs. Django's default
+# console handler is filtered by DEBUG, so production 500s otherwise lack traces.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console_errors": {
+            "class": "logging.StreamHandler",
+            "level": "ERROR",
+        },
+    },
+    "loggers": {
+        "django.request": {
+            "handlers": ["console_errors"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}
