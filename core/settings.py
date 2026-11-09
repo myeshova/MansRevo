@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-jd@f*)^qb#j(swu@$lo$#s(y#u+x&i_g2zx37+*n)#q$_$ux9p"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Around line 28 inside core/settings.py
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
@@ -189,21 +189,14 @@ if not DEBUG:
     CSRF_TRUSTED_ORIGINS = ['https://mansrevo.onrender.com']
 
 
-# TEMPORARY HARD FORCED LOGIN OVERRIDE
 from django.contrib.auth import get_user_model
-try:
-    User = get_user_model()
-    # Check if your primary profile already exists
-    user_profile = User.objects.filter(username='myeshova').first()
-    if user_profile:
-        # Re-enforce explicit staff parameters and set a fresh clear password
-        user_profile.is_superuser = True
-        user_profile.is_staff = True
-        user_profile.is_active = True
-        user_profile.set_password('MansRevoMaster2026!')
-        user_profile.save()
-    else:
-        # If it somehow got misplaced during state resets, rebuild it clean
-        User.objects.create_superuser('myeshova', 'admin@example.com', 'MansRevoMaster2026!')
-except Exception:
-    pass
+User = get_user_model()
+user_profile = User.objects.filter(username='myeshova').first()
+if user_profile:
+    user_profile.is_superuser = True
+    user_profile.is_staff = True
+    user_profile.is_active = True
+    user_profile.set_password('MansRevoMaster2026!')
+    user_profile.save()
+else:
+    User.objects.create_superuser('myeshova', 'admin@example.com', 'MansRevoMaster2026!')
