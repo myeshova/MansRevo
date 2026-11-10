@@ -21,11 +21,11 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Tall Editorial Header Navigation */
+        /* Compact storefront header */
         header {
             border-bottom: 1px solid var(--border-color);
             background: white;
-            padding: 40px 0;
+            padding: 14px 0;
         }
 
         .header-container {
@@ -33,24 +33,28 @@
             margin: 0 auto;
             padding: 0 40px;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            gap: 30px;
+            justify-content: space-between;
+            gap: 24px;
         }
 
         .logo {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 8px;
+            letter-spacing: 6px;
             text-decoration: none;
             color: var(--text-primary);
+            white-space: nowrap;
         }
 
         /* Premium Search bar block */
         .search-form {
-            width: 100%;
+            flex: 1;
+            width: auto;
             max-width: 500px;
+            min-width: 240px;
             display: flex;
             border: 1px solid #111;
             padding: 4px;
@@ -60,7 +64,7 @@
         .search-input {
             flex: 1;
             border: none;
-            padding: 12px 16px;
+            padding: 10px 12px;
             font-size: 0.9rem;
             outline: none;
             letter-spacing: 0.5px;
@@ -70,7 +74,7 @@
             background: #111;
             color: white;
             border: none;
-            padding: 0 25px;
+            padding: 0 20px;
             text-transform: uppercase;
             font-size: 0.75rem;
             font-weight: 600;
@@ -85,8 +89,9 @@
 
         .nav-links {
             display: flex;
-            gap: 40px;
-            margin-top: 5px;
+            gap: 24px;
+            margin-top: 0;
+            flex-shrink: 0;
         }
 
         .nav-links a {
@@ -105,7 +110,7 @@
         /* Large Hero Banner Section */
         .hero-banner {
             width: 100%;
-            height: 600px;
+            height: clamp(620px, 82vh, 980px);
             background-color: #222;
             position: relative;
             overflow: hidden;
@@ -248,6 +253,51 @@
             color: var(--text-secondary);
             letter-spacing: 1px;
         }
+
+        @media (max-width: 900px) {
+            header {
+                padding: 18px 0;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            .logo {
+                font-size: 1.6rem;
+                letter-spacing: 5px;
+            }
+
+            .search-form {
+                flex: initial;
+                width: 100%;
+                max-width: 540px;
+            }
+
+            .nav-links {
+                gap: 22px;
+            }
+
+            .hero-banner {
+                height: clamp(440px, 68vh, 720px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-container {
+                padding: 0 20px;
+            }
+
+            .search-input {
+                min-width: 0;
+                font-size: 0.8rem;
+            }
+
+            .search-button {
+                padding: 0 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -286,7 +336,7 @@
             </div>
         {% else %}
             <!-- Default placeholder backdrop wrapper if you haven't uploaded an image yet -->
-            <div class="no-image" style="background: #222; color: #666; height: 600px; display: flex; align-items: center; justify-content: center; letter-spacing: 2px; text-transform: uppercase;">
+            <div class="no-image" style="background: #222; color: #666; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; letter-spacing: 2px; text-transform: uppercase;">
                 Go to Admin Dashboard > Storefront Configurations to upload your main image.
             </div>
         {% endif %}
