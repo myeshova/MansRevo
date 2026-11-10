@@ -169,7 +169,7 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
             gap: 40px 30px;
         }
 
@@ -296,6 +296,44 @@
 
             .search-button {
                 padding: 0 14px;
+            }
+
+            .hero-overlay {
+                padding: 0 18px;
+            }
+
+            .hero-overlay h1 {
+                font-size: 1.8rem;
+                letter-spacing: 3px;
+                line-height: 1.2;
+            }
+
+            .hero-overlay p {
+                font-size: 0.75rem;
+                letter-spacing: 1.5px;
+                line-height: 1.5;
+            }
+
+            main {
+                margin: 36px auto;
+                padding: 0 18px;
+            }
+
+            .collection-title {
+                font-size: 1.1rem;
+                letter-spacing: 2px;
+                margin-bottom: 24px;
+            }
+
+            .grid {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 28px;
+            }
+
+            .image-wrapper {
+                height: auto;
+                aspect-ratio: 4 / 5;
+                margin-bottom: 12px;
             }
         }
     </style>
