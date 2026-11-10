@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Bag — MansRevo</title>
+    <style>
+        :root {
+            --text-primary: #111;
+            --text-secondary: #666;
+            --border-color: #e5e5e5;
+            --page-bg: #fcfcfc;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--page-bg);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            background: #fff;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo, .back-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+        }
+
+        .back-link {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+        }
+
+        main {
+            width: min(100% - 48px, 1000px);
+            margin: 54px auto 80px;
+        }
+
+        h1 {
+            margin: 0 0 30px;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .message {
+            margin: 0 0 18px;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            font-size: 0.9rem;
+        }
+
+        .bag-list { border-top: 1px solid var(--border-color); }
+
+        .bag-item {
+            display: grid;
+            grid-template-columns: 128px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 24px;
+            padding: 22px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .item-image {
+            width: 128px;
+            aspect-ratio: 4 / 5;
+            object-fit: cover;
+            background: #f2f2f2;
+        }
+
+        .item-brand {
+            margin: 0 0 7px;
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .item-name {
+            margin: 0 0 10px;
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+
+        .item-price, .line-total { font-size: 0.9rem; }
+
+        .quantity-form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .quantity-input {
+            width: 72px;
+            min-height: 38px;
+            padding: 6px 8px;
+            border: 1px solid var(--border-color);
+            font: inherit;
+        }
+
+        .action-button {
+            min-height: 38px;
+            padding: 8px 12px;
+            border: 1px solid var(--text-primary);
+            background: #fff;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.72rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .action-button:hover { background: #f3f3f3; }
+
+        .remove-button {
+            border-color: transparent;
+            color: var(--text-secondary);
+        }
+
+        .bag-summary {
+            display: flex;
+            justify-content: space-between;
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .empty-bag {
+            padding: 42px 0;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .continue-link {
+            display: inline-block;
+            margin-top: 24px;
+            color: var(--text-primary);
+            font-size: 0.78rem;
+            letter-spacing: 1.5px;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .continue-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+        @media (max-width: 600px) {
+            .nav-container { padding: 15px 18px; }
+            .logo { font-size: 1rem; letter-spacing: 3px; }
+            .back-link { font-size: 0.68rem; }
+            main { width: calc(100% - 36px); margin: 34px auto 52px; }
+            h1 { margin-bottom: 22px; }
+            .bag-item { grid-template-columns: 88px minmax(0, 1fr); gap: 14px; }
+            .item-image { width: 88px; }
+            .line-total { grid-column: 2; }
+            .quantity-form { gap: 6px; }
+            .action-button { padding: 7px 9px; font-size: 0.66rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo">MansRevo</a>
+            <a href="/" class="back-link">Continue shopping</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>Your Bag <span>({{ bag_count }})</span></h1>
+
+        {% for message in messages %}
+            <div class="message" role="status">{{ message }}</div>
+        {% endfor %}
+
+        {% if items %}
+            <div class="bag-list">
+                {% for item in items %}
+                    <article class="bag-item">
+                        {% if item.product.image %}
+                            <img class="item-image" src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                        {% else %}
+                            <div class="item-image" aria-label="No image available"></div>
+                        {% endif %}
+
+                        <div class="item-details">
+                            <p class="item-brand">{{ item.product.brand|default:"In-House" }}</p>
+                            <h2 class="item-name">{{ item.product.name }}</h2>
+                            <div class="item-price">${{ item.product.price|floatformat:2 }} each</div>
+                            <form class="quantity-form" method="post" action="{% url 'update_bag' item.product.pk %}">
+                                {% csrf_token %}
+                                <label class="visually-hidden" for="quantity-{{ item.product.pk }}">Quantity for {{ item.product.name }}</label>
+                                <input class="quantity-input" id="quantity-{{ item.product.pk }}" type="number" name="quantity" min="1" max="{{ item.product.stock }}" value="{{ item.quantity }}">
+                                <button class="action-button" type="submit" name="action" value="update">Update</button>
+                                <button class="action-button remove-button" type="submit" name="action" value="remove">Remove</button>
+                            </form>
+                        </div>
+
+                        <div class="line-total">${{ item.line_total|floatformat:2 }}</div>
+                    </article>
+                {% endfor %}
+            </div>
+
+            <div class="bag-summary"><span>Subtotal</span><span>${{ subtotal|floatformat:2 }}</span></div>
+            <a class="continue-link" href="/">Continue shopping</a>
+        {% else %}
+            <div class="empty-bag">
+                Your bag is empty. Browse the collection to find something you like.
+                <br><a class="continue-link" href="/">Shop the collection</a>
+            </div>
+        {% endif %}
+    </main>
+</body>
+</html>

@@ -45,6 +45,19 @@
             color: var(--text-primary);
         }
 
+        .bag-link {
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+
+        .bag-link:hover {
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
         /* Split Screen Container */
         .main-container {
             max-width: 1200px;
@@ -156,6 +169,11 @@
             background: #222;
         }
 
+        .purchase-btn:disabled {
+            background: #888;
+            cursor: not-allowed;
+        }
+
         .purchase-btn:active {
             transform: scale(0.99);
         }
@@ -208,6 +226,10 @@
                 letter-spacing: 3px;
             }
 
+            .bag-link {
+                font-size: 0.72rem;
+            }
+
             .main-container {
                 margin: 22px auto 40px;
                 padding: 0 18px;
@@ -255,6 +277,7 @@
     <header>
         <div class="nav-container">
             <a href="/" class="logo">MANSREVO</a>
+            <a href="{% url 'bag' %}" class="bag-link">Bag ({{ bag_count }})</a>
         </div>
     </header>
 
@@ -282,8 +305,19 @@
                     {{ product.description|default:"Crafted with careful attention to silhouette, weight, and texture. This contemporary essential is detailed with premium finishes, designed to easily layer within a modern uniform structure." }}
                 </p>
 
-                <button class="purchase-btn">Add to Bag</button>
-                <div class="inventory-status">Limited Release — Only {{ product.stock }} Units Remain</div>
+                <form action="{% url 'add_to_bag' product.pk %}" method="post">
+                    {% csrf_token %}
+                    <button class="purchase-btn" type="submit" {% if product.stock <= 0 %}disabled{% endif %}>
+                        {% if product.stock > 0 %}Add to Bag{% else %}Out of Stock{% endif %}
+                    </button>
+                </form>
+                <div class="inventory-status">
+                    {% if product.stock > 0 %}
+                        Limited Release — Only {{ product.stock }} Units Remain
+                    {% else %}
+                        Currently unavailable
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
