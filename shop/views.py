@@ -199,14 +199,15 @@ def create_checkout_session(request):
         return redirect("bag")
 
     session = stripe.checkout.Session.create(
-        ui_mode="hosted",
+        ui_mode="hosted_page",
         mode="payment",
         billing_address_collection="auto",
         phone_number_collection={"enabled": False},
         automatic_tax={"enabled": False},
         allow_promotion_codes=False,
         submit_type="auto",
-        metadata={"integration_identifier": "hosted_web_0001", "origin_context": "web"},
+        integration_identifier="hosted_web_0001",
+        origin_context="web",
         success_url=request.build_absolute_uri(reverse("checkout_success")) + "?session_id={CHECKOUT_SESSION_ID}",
         cancel_url=request.build_absolute_uri(reverse("bag")),
         line_items=line_items,

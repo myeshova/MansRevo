@@ -23,22 +23,22 @@ The checkout currently uses project-defined URLs and product prices. Confirm or 
 
 | Parameter | Value |
 |-----------|-------|
-| ui_mode | `hosted` (Stripe Python SDK 16.x is below 21.0.0) |
+| ui_mode | `hosted_page` (Stripe-hosted Checkout) |
 | mode | `payment` |
 | billing_address_collection | `auto` |
 | phone_number_collection | `{"enabled": false}` |
 | automatic_tax | `{"enabled": false}` |
 | allow_promotion_codes | `false` |
 | submit_type | `auto` |
-| integration_identifier | `hosted_web_0001` (stored in Session metadata) |
-| origin_context | `web` (stored in Session metadata) |
+| integration_identifier | `hosted_web_0001` |
+| origin_context | `web` |
 | payment_method_collection | Omitted because mode is `payment`; include `always` only for subscription mode. |
 | line_items | Built from current bag items and database prices using `price_data` |
 
 ## Setup and next steps
 
 - Replace the `STRIPE_SECRET_KEY=sk_test_...` placeholder in the project `.env` with your Stripe test secret key for local testing. Keep secret keys server-side and out of source control.
-- Install dependencies with `pip install -r requirements.txt`. This project uses Stripe Python SDK `stripe>=16,<17`; this is below 21.0.0, so the hosted UI mode value is `hosted`. If the SDK is upgraded to 21.0.0 or later, update it to `hosted_page`.
+- Install dependencies with `pip install -r requirements.txt`. The project uses Stripe Python SDK `stripe>=16,<17`; Checkout is configured with Stripe’s hosted page mode (`hosted_page`).
 - Set live keys only in the deployment environment after successful test mode checkout.
 - The new app files are [shop/views.py](shop/views.py), [shop/urls.py](shop/urls.py), [shop/templates/shop/bag.html](shop/templates/shop/bag.html), and [shop/templates/shop/checkout_success.html](shop/templates/shop/checkout_success.html).
 - Flow: the bag form posts to Django, which validates bag products and quantities, creates a hosted Checkout Session using database prices, then redirects the customer to Stripe. A success route displays a confirmation page.
