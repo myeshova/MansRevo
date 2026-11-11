@@ -1,7 +1,11 @@
 from decimal import Decimal
+import os
+
+import stripe
 
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 from django.db.models import Q
 from django.views.decorators.http import require_POST
 from .models import Product, StorefrontConfig
@@ -148,3 +152,68 @@ def update_bag(request, product_id):
 
     request.session["bag"] = bag
     return redirect("bag")
+
+
+@require_POST
+def create_checkout_session(request):
+    bag = _get_bag(request)
+    product_ids = []
+    for raw_id in bag:
+        try:
+            product_ids.append(int(raw_id))
+        except (TypeError, ValueError):
+            continue
+
+    products = Product.objects.filter(pk__in=product_ids).in_bulk()
+    line_items = []
+    cleaned_bag = {}
+    for raw_id, raw_quantity in bag.items():
+        try:
+            product_id = int(raw_id)
+            quantity = int(raw_quantity)
+        except (TypeError, ValueError):
+            continue
+
+        product = products.get(product_id)
+        if product is None or product.stock <= 0 or quantity <= 0:
+            continue
+        quantity = min(quantity, product.stock)
+        cleaned_bag[str(product_id)] = quantity
+        line_items.append({
+            "price_data": {
+                "currency": "usd",
+                "unit_amount": int(product.price * 100),
+                "product_data": {"name": product.name},
+            },
+            "quantity": quantity,
+        })
+
+    if not line_items:
+        messages.error(request, "Your bag is empty or its items are unavailable.")
+        return redirect("bag")
+
+    request.session["bag"] = cleaned_bag
+    stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+    if not stripe.api_key:
+        messages.error(request, "Checkout is not configured yet.")
+        return redirect("bag")
+
+    session = stripe.checkout.Session.create(
+        ui_mode="hosted",
+        mode="payment",
+        billing_address_collection="auto",
+        phone_number_collection={"enabled": False},
+        automatic_tax={"enabled": False},
+        allow_promotion_codes=False,
+        submit_type="auto",
+        metadata={"integration_identifier": "hosted_web_0001", "origin_context": "web"},
+        success_url=request.build_absolute_uri(reverse("checkout_success")) + "?session_id={CHECKOUT_SESSION_ID}",
+        cancel_url=request.build_absolute_uri(reverse("bag")),
+        line_items=line_items,
+    )
+    return redirect(session.url, permanent=False)
+
+
+def checkout_success(request):
+    return render(request, "shop/checkout_success.html")
+

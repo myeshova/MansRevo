@@ -241,6 +241,10 @@
             </div>
 
             <div class="bag-summary"><span>Subtotal</span><span>${{ subtotal|floatformat:2 }}</span></div>
+            <form method="post" action="{% url 'create_checkout_session' %}">
+                {% csrf_token %}
+                <button class="action-button" type="submit">Checkout with Stripe</button>
+            </form>
             <a class="continue-link" href="/">Continue shopping</a>
         {% else %}
             <div class="empty-bag">
@@ -249,5 +253,6 @@
             </div>
         {% endif %}
     </main>
+
 </body>
 </html>
