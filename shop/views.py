@@ -19,6 +19,14 @@ from .models import Product, StorefrontConfig, Order, OrderItem
 logger = logging.getLogger(__name__)
 
 
+_SHIPPING_COUNTRIES = tuple("""
+    US CA MX BZ CR SV GT HN NI PA AG BS BB CU DM DO GD HT JM KN LC VC TT
+    AR BO BR CL CO EC GY PY PE SR UY VE
+    AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE
+    GB CH NO IS LI
+""".split())
+
+
 def _get_bag(request):
     bag = request.session.get("bag", {})
     if not isinstance(bag, dict):
@@ -330,6 +338,14 @@ def create_checkout_session(request):
             ui_mode="hosted_page",
             mode="payment",
             billing_address_collection="auto",
+            shipping_address_collection={"allowed_countries": list(_SHIPPING_COUNTRIES)},
+            shipping_options=[{
+                "shipping_rate_data": {
+                    "type": "fixed_amount",
+                    "fixed_amount": {"amount": 1000, "currency": "usd"},
+                    "display_name": "Standard shipping",
+                }
+            }],
             phone_number_collection={"enabled": False},
             automatic_tax={"enabled": False},
             allow_promotion_codes=False,
