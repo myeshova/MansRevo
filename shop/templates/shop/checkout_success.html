@@ -3,12 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thank you — MansRevo</title>
+    <title>Checkout — MansRevo</title>
 </head>
 <body>
     <main>
-        <h1>Thank you for your order</h1>
-        <p>Stripe has returned you to MansRevo. Your payment is confirmed after server-side fulfillment verifies it.</p>
+        {% if payment_confirmed and order %}
+            <h1>Thank you for your order</h1>
+            <p>Payment confirmed. Order {{ order.order_number }} has been recorded.</p>
+            {% if order.status == "needs_review" %}
+                <p>Your order is being reviewed by the store before shipment. We’ll email you with an update.</p>
+            {% else %}
+                <p>A confirmation email will be sent to {{ order.email }}.</p>
+            {% endif %}
+        {% else %}
+            <h1>We’re confirming your payment</h1>
+            <p>Your order details will be emailed after Stripe confirms the payment. If you canceled checkout, you can return to your bag.</p>
+        {% endif %}
         <a href="/">Continue shopping</a>
     </main>
 </body>
