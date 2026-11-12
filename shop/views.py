@@ -1,6 +1,6 @@
 import logging
 import os
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from decimal import Decimal
 
 import stripe
 from django.conf import settings
@@ -142,64 +142,6 @@ def update_bag(request, product_id):
             messages.success(request, "Your bag was updated.")
     request.session["bag"] = bag
     return redirect("bag")
-
-
-_SHIPPING_REGIONS = [
-    (
-        "North America",
-        "STRIPE_SHIPPING_NORTH_AMERICA_USD",
-        "STRIPE_SHIPPING_NORTH_AMERICA_COUNTRIES",
-        "US,CA,MX,BZ,CR,SV,GT,HN,NI,PA,AG,BS,BB,CU,DM,DO,GD,HT,JM,KN,LC,VC,TT",
-    ),
-    (
-        "South America",
-        "STRIPE_SHIPPING_SOUTH_AMERICA_USD",
-        "STRIPE_SHIPPING_SOUTH_AMERICA_COUNTRIES",
-        "AR,BO,BR,CL,CO,EC,GY,PY,PE,SR,UY,VE",
-    ),
-    (
-        "Europe",
-        "STRIPE_SHIPPING_EUROPE_USD",
-        "STRIPE_SHIPPING_EUROPE_COUNTRIES",
-        "AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,GB,CH,NO,IS,LI",
-    ),
-]
-
-
-def _get_shipping_options():
-    options = []
-    allowed_countries = []
-    missing_regions = []
-    for region, amount_name, countries_name, default_countries in _SHIPPING_REGIONS:
-        amount_text = os.getenv(amount_name, "").strip()
-        if not amount_text:
-            missing_regions.append(region)
-            continue
-        try:
-            amount_cents = int((Decimal(amount_text) * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
-        except (InvalidOperation, ValueError):
-            raise ValueError(f"{amount_name} must be a valid USD amount.")
-        if amount_cents <= 0:
-            raise ValueError(f"{amount_name} must be greater than zero.")
-        countries_value = os.getenv(countries_name, "").strip() or default_countries
-        countries = [
-            code.strip().upper()
-            for code in countries_value.split(",")
-            if code.strip()
-        ]
-        allowed_countries.extend(countries)
-        options.append({
-            "shipping_rate_data": {
-                "type": "fixed_amount",
-                "fixed_amount": {"amount": amount_cents, "currency": "usd"},
-                "display_name": f"Standard shipping — {region}",
-                "tax_behavior": "exclusive",
-                "tax_code": "txcd_92010001",
-            }
-        })
-    if missing_regions:
-        raise ValueError("Set shipping rates for: " + ", ".join(missing_regions))
-    return options, sorted(set(allowed_countries))
 
 
 def _money_from_cents(value):
@@ -357,12 +299,6 @@ def create_checkout_session(request):
     if not stripe.api_key or stripe.api_key.endswith("..."):
         messages.error(request, "Stripe test or live keys have not been configured on this server.")
         return redirect("bag")
-    try:
-        shipping_options, allowed_countries = _get_shipping_options()
-    except ValueError as exc:
-        messages.error(request, f"Checkout setup is incomplete: {exc}")
-        return redirect("bag")
-
     order = Order.objects.create(
         subtotal_amount=subtotal,
         total_amount=subtotal,
@@ -391,15 +327,14 @@ def create_checkout_session(request):
 
     try:
         session = stripe.checkout.Session.create(
-            ui_mode="hosted_page",
+            ui_mode="hosted",
             mode="payment",
             billing_address_collection="auto",
-            shipping_address_collection={"allowed_countries": allowed_countries},
-            shipping_options=shipping_options,
-            automatic_tax={"enabled": True},
+            phone_number_collection={"enabled": False},
+            automatic_tax={"enabled": False},
             allow_promotion_codes=False,
             submit_type="auto",
-            integration_identifier="hosted_web_0001",
+            integration_identifier="hosted_web_0002",
             origin_context="web",
             client_reference_id=str(order.pk),
             metadata={"order_id": str(order.pk)},

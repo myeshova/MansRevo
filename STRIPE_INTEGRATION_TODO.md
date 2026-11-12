@@ -1,61 +1,53 @@
-# Stripe Checkout production setup
+# Stripe Checkout setup
 
 ## Values to Replace
 
-Do not commit `.env`, Stripe keys, webhook secrets, or Gmail app passwords. `.env` is ignored by Git. Enter production secrets directly in the Render service’s Environment settings.
+There are no placeholder values in the existing Checkout Session call. The store builds `line_items` from its own product database with `price_data`, so no Stripe catalog or Stripe Price IDs are required.
 
-**Files with placeholders or configurable values:**
-- [.env](.env) for local development only
-- [shop/views.py](shop/views.py) for shipping-rate environment-variable names
+**Files containing Checkout Session parameters:**
+- [shop/views.py](shop/views.py)
 
-| Setting | Current value | What to set |
+| Field | Current Value | What to Set |
 |---|---|---|
-| `STRIPE_SECRET_KEY` | Test key in local `.env`; not configured in Render | Use an `sk_test_...` key for test deploys, then an `sk_live_...` key only after all launch checks pass. |
-| `STRIPE_WEBHOOK_SECRET` | Blank locally; not configured in Render | Add the signing secret (`whsec_...`) for the matching test or live webhook endpoint. |
-| `STRIPE_SHIPPING_NORTH_AMERICA_USD` | Blank | Your flat USD shipping charge for North America. Required before checkout is enabled. |
-| `STRIPE_SHIPPING_SOUTH_AMERICA_USD` | Blank | Your flat USD shipping charge for South America. Required before checkout is enabled. |
-| `STRIPE_SHIPPING_EUROPE_USD` | Blank | Your flat USD shipping charge for Europe. Required before checkout is enabled. |
-| `STRIPE_SHIPPING_*_COUNTRIES` | Default country groups in `shop/views.py` | Optional comma-separated ISO country codes to replace a region’s defaults. |
-| `EMAIL_HOST_PASSWORD` | Blank | Gmail App Password for `mansrevo@gmail.com`; enter privately in Render. |
-| `DJANGO_SECRET_KEY` | Generated in local `.env` | Copy this private value into Render before deploying the updated settings. Do not commit it or share it in chat. |
+| `mode` | `payment` | Already correct for one-time product purchases. |
+| `success_url` | Current site's `checkout_success` route with `{CHECKOUT_SESSION_ID}` | Already uses the app's real route. |
+| `cancel_url` | Current site's `bag` route | Already uses the app's real route. |
+| `line_items` | Product names, prices, and quantities from the Django product database | Already populated from the customer's validated bag; no Stripe Price IDs to replace. |
 
-## Configured Checkout Parameters
+## Configured Parameters
 
-**Files:** [shop/views.py](shop/views.py)
+**File containing these parameters:**
+- [shop/views.py](shop/views.py)
 
 | Parameter | Value |
 |---|---|
-| `ui_mode` | `hosted_page` |
+| `ui_mode` | `hosted` (Stripe Python SDK 16.1.0) |
 | `mode` | `payment` |
 | `billing_address_collection` | `auto` |
-| `shipping_address_collection` | Country groups for North America, South America, and Europe |
-| `shipping_options` | Region-specific fixed USD rates read from Render environment variables |
-| `automatic_tax` | Enabled; register U.S. tax locations and set apparel tax defaults in Stripe before live mode |
-| `allow_promotion_codes` | `false` |
 | `phone_number_collection` | `{"enabled": false}` |
+| `automatic_tax` | `{"enabled": false}` |
+| `allow_promotion_codes` | `false` |
 | `submit_type` | `auto` |
-| `integration_identifier` | `hosted_web_0001` |
+| `integration_identifier` | `hosted_web_0002` |
 | `origin_context` | `web` |
-| `line_items` | Product names, prices, and quantities from the validated bag/database |
-| `success_url` | Current site’s verified checkout return route |
-| `cancel_url` | Current site’s bag route |
+| `success_url` | Current site's `checkout_success` route with the Checkout Session ID template |
+| `cancel_url` | Current site's `bag` route |
+| `line_items` | Dynamic `price_data` generated from the Django catalog and bag |
 
-## Setup and launch steps
+`payment_method_collection` is omitted because this is a one-time `payment` Session; the Checkout Studio setting applies only to subscription mode.
 
-1. Confirm Render is connected to the production PostgreSQL database. Orders and inventory updates use Django’s default database.
-2. In Render, set `DJANGO_SECRET_KEY` before deploying this version. The code now refuses to start in production without it; the prior hard-coded development key was removed.
-3. Set the three `STRIPE_SHIPPING_*_USD` amounts in Render. Checkout stays blocked until all three are configured. The defaults cover the U.S., Canada, Mexico, Central America and Caribbean countries listed in code; South American countries; and EU countries plus the UK, Switzerland, Norway, Iceland, and Liechtenstein. Override country lists if your carrier coverage differs.
-4. Configure Stripe Tax in the Stripe Dashboard: activate U.S. registrations where your business is registered to collect, and choose the appropriate default tax category for your apparel. Checkout adds tax to the listed prices and shipping where Stripe Tax applies.
-5. Configure Gmail SMTP in Render: `EMAIL_HOST=smtp.gmail.com`, `EMAIL_PORT=587`, `EMAIL_USE_TLS=True`, `EMAIL_HOST_USER=mansrevo@gmail.com`, `EMAIL_HOST_PASSWORD=<Gmail app password>`, `DEFAULT_FROM_EMAIL=mansrevo@gmail.com`. Never put the app password in Git or chat. Google requires 2-Step Verification for App Passwords, and may restrict their availability. [Google App Password guidance](https://support.google.com/mail/answer/185833)
-6. Add a Stripe webhook endpoint at `https://mansrevo.onrender.com/stripe/webhook/` for `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, and `checkout.session.expired`. Put that endpoint’s signing secret in Render as `STRIPE_WEBHOOK_SECRET`. Use separate test and live endpoints/secrets.
-7. Set Render’s pre-deploy command to `python manage.py migrate` so migration `shop.0005_order_orderitem` creates the order tables before the new service starts.
-8. Deploy with test keys first. Verify checkout, test webhook delivery, order records in Django admin, inventory decrement, tax, shipping, and a customer email. Do not use real cards with test keys or test cards with live keys.
-9. After successful staging checks, complete Stripe’s account activation and go-live checklist, replace the Render test Stripe key and webhook secret with live-mode values, and redeploy. Live mode processes real payments.
+## Setup and next steps
 
-## Flow and fulfillment
+1. Keep `STRIPE_SECRET_KEY` server-side only. For a test deployment, set a Stripe **test** secret key in Render's Environment settings. Do not commit `.env` or any Stripe key. Redeploy the branch Render is connected to after committing and pushing this change.
+2. Test the deployed checkout using Stripe test mode, not a live key or a real card. Use the test card `4242 4242 4242 4242`, any future expiry date, and any CVC. Confirm the browser is redirected to Stripe Checkout and returns to the store after payment.
+3. Verify order creation, webhook delivery, inventory updates, and customer email in the test environment before enabling live payments. Configure the matching test webhook secret in Render if it is not already set.
+4. Before live mode, configure the live Stripe key and live webhook signing secret in Render, complete Stripe's account activation steps, and redeploy. Live keys charge real cards.
+5. Update this TODO if you later add Stripe catalog Price IDs, subscriptions, taxes, shipping collection, or other Checkout parameters.
 
-The bag POST creates a pending order and line-item snapshots, then creates a Stripe hosted Checkout Session. The signed webhook verifies payment, updates shipping/tax totals, decrements stock once, and sends the order email. Repeated webhook events do not decrement inventory again. If inventory is insufficient when payment is confirmed, the paid order is marked for admin review.
+## Project structure and flow
 
-The success page also verifies the session with Stripe; it is not the source of truth for payment. Orders are visible in Django admin. Store emails use Gmail SMTP and require the Render settings above.
+No files or routes were added for this Scenario A update. The existing bag view creates the Checkout Session using current database-backed product details, then redirects to Stripe's hosted payment page. The existing success route and webhook handle the return and payment confirmation flow.
 
-Stripe resources: [API keys](https://docs.stripe.com/keys), [Checkout fulfillment/webhooks](https://docs.stripe.com/checkout/fulfillment.md?ui=full-page), [Stripe Tax](https://docs.stripe.com/tax), and [Go-live checklist](https://docs.stripe.com/get-started/checklist/go-live.md).
+This Checkout Session uses the supplied Checkout Studio settings, including disabled automatic tax. Shipping collection and shipping options are not included in the configured parameter set for this Session. The old shipping helper and its `STRIPE_SHIPPING_FLAT_USD` pre-check have been removed, so that environment variable is not required by this checkout code.
+
+Resources: [Stripe support](https://support.stripe.com), [Stripe Checkout documentation](https://docs.stripe.com/checkout), [Stripe testing](https://docs.stripe.com/testing), and [Stripe docs MCP](https://docs.stripe.com/mcp).
