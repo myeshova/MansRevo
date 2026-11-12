@@ -21,7 +21,7 @@ There are no placeholder values in the existing Checkout Session call. The store
 
 | Parameter | Value |
 |---|---|
-| `ui_mode` | `hosted` (Stripe Python SDK 16.1.0) |
+| `ui_mode` | `hosted_page` (the running Stripe API rejected `hosted` and requested `hosted_page`) |
 | `mode` | `payment` |
 | `billing_address_collection` | `auto` |
 | `phone_number_collection` | `{"enabled": false}` |

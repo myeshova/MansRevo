@@ -327,7 +327,7 @@ def create_checkout_session(request):
 
     try:
         session = stripe.checkout.Session.create(
-            ui_mode="hosted",
+            ui_mode="hosted_page",
             mode="payment",
             billing_address_collection="auto",
             phone_number_collection={"enabled": False},
