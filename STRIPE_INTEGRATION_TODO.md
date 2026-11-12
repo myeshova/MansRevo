@@ -51,6 +51,6 @@ There are no placeholder values in the existing Checkout Session call. The store
 
 No files or routes were added for this Scenario A update. The existing bag view creates the Checkout Session using current database-backed product details, then redirects to Stripe's hosted payment page. The existing success route and webhook handle the return and payment confirmation flow.
 
-This Checkout Session uses the supplied Checkout Studio settings, including disabled automatic tax. Checkout collects shipping addresses for the configured North America, South America, and Europe destinations, then adds a flat $10.00 USD shipping fee. The rate is created inline by the server; no Stripe catalog item or dashboard shipping rate is needed.
+This Checkout Session uses the supplied Checkout Studio settings, including disabled automatic tax. Checkout collects shipping addresses for the configured North America, South America, and Europe destinations, then adds a flat $10.00 USD shipping fee. Cuba is excluded because Stripe rejects `CU` as a shipping country. The rate is created inline by the server; no Stripe catalog item or dashboard shipping rate is needed.
 
 Resources: [Stripe support](https://support.stripe.com), [Stripe Checkout documentation](https://docs.stripe.com/checkout), [Stripe testing](https://docs.stripe.com/testing), and [Stripe docs MCP](https://docs.stripe.com/mcp).
